@@ -48,26 +48,10 @@ GitHub Pages 같은 `https://` 주소로 열면 휴대폰 홈 화면에 앱처�
 | `logic.js` | 점수 계산 · 랭킹 정렬 (화면과 무관한 순수 함수) |
 | `manifest.json`, `icons/` | 앱 이름·아이콘·전체 화면 설정 (PWA) |
 | `sw.js` | 오프라인 실행을 위한 서비스 워커 |
-| `questions.js` | 문제 240개 (`window.QUESTIONS`). 직접 고치지 마세요. |
-| `gen_questions.py` | 문제 생성기 (`fractions`로 정답을 직접 계산) |
-| `validate_questions.py` | 문제 데이터 검증 |
-| `tests.js`, `test.html` | 점수 · 랭킹 테스트 |
+| `questions.js` | 문제 240개 (`window.QUESTIONS`). 완성된 데이터 파일이에요. |
+| `README.md` | 이 문서 |
 
-## 문제 데이터 다시 만들기 (선택)
-
-Python 3가 필요해요.
-
-```
-python gen_questions.py        # questions.js 생성 (시드 고정, 항상 같은 결과)
-python validate_questions.py   # 240문제 검증, 하나라도 실패하면 종료 코드 1
-```
-
-## 테스트
-
-- 브라우저: `test.html`을 열면 결과가 바로 보여요.
-- Node.js가 있다면: `node tests.js` (실패가 있으면 종료 코드 1)
-
-점수 계산(기본 10점, 보너스 0~5점, 만점 300점)과 랭킹 정렬(점수 → 시간 → 달성 순서), 종류별 순위, 저장 개수 제한, 망가진 저장값 걸러내기를 확인해요.
+> 문제를 만든 생성·검증 스크립트(Python)와 점수·랭킹 테스트는 이 저장소에 포함하지 않았어요. 게임을 실행하는 데는 필요 없어요.
 
 ## GitHub Pages로 배포하기
 
