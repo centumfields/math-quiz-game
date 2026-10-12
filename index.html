@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>수학 연산 퀴즈</title>
+<meta name="description" content="자연수·정수·유리수의 사칙연산을 4지선다로 푸는 퀴즈 게임">
+
+<!-- PWA: 홈 화면에 추가하면 주소창 없이 앱처럼 열려요 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3b5bdb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11141c" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="수학퀴즈">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+
+  <div class="appbar">
+    <button type="button" class="icon-btn" id="sound-btn" aria-pressed="false" aria-label="소리 끄기">🔊</button>
+  </div>
+
+  <!-- 1. 홈 -->
+  <section id="screen-home" class="screen" aria-labelledby="home-title">
+    <h1 id="home-title" tabindex="-1" data-focus>수학 연산 퀴즈</h1>
+    <p class="lead">덧셈, 뺄셈, 곱셈, 나눗셈 문제를 풀어 봐요!</p>
+    <p class="notice store-notice" hidden></p>
+
+    <form id="home-form" novalidate>
+      <div class="field">
+        <label for="nick">내 이름(닉네임)을 적어 주세요</label>
+        <input id="nick" name="nick" type="text" maxlength="10" autocomplete="off" placeholder="예: 수학왕" aria-describedby="nick-error">
+        <p id="nick-error" class="error" role="alert" hidden></p>
+      </div>
+
+      <fieldset class="modes">
+        <legend>어떻게 풀까요?</legend>
+        <label class="mode">
+          <input type="radio" name="mode" value="category" checked>
+          <span class="mode-body"><strong>카테고리 20문제</strong><small>한 가지 계산만 풀어요</small></span>
+        </label>
+        <label class="mode">
+          <input type="radio" name="mode" value="area">
+          <span class="mode-body"><strong>영역 80문제</strong><small>자연수, 정수, 유리수 중 하나를 풀어요</small></span>
+        </label>
+        <label class="mode">
+          <input type="radio" name="mode" value="all">
+          <span class="mode-body"><strong>전체 240문제</strong><small>모든 문제를 풀어요</small></span>
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="btn primary" id="home-go">다음</button>
+        <button type="button" class="btn ghost" id="home-rank">🏆 랭킹 보기</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 2. 카테고리 선택 -->
+  <section id="screen-cat" class="screen" aria-labelledby="cat-title" hidden>
+    <button type="button" class="link" id="cat-back">← 뒤로</button>
+    <h2 id="cat-title" tabindex="-1" data-focus></h2>
+    <p class="lead" id="cat-help"></p>
+    <div class="cat-grid" id="cat-grid"></div>
+  </section>
+
+  <!-- 3. 퀴즈 -->
+  <section id="screen-quiz" class="screen" aria-label="퀴즈" hidden>
+    <div class="quiz-top">
+      <button type="button" class="link" id="quit">← 그만하기</button>
+      <span class="score" id="score">점수 0</span>
+    </div>
+    <div class="progress" id="progress" role="progressbar" aria-label="진행" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+      <div id="bar"></div>
+    </div>
+    <p class="progress-text" id="progress-text"></p>
+
+    <div class="timer" id="timer" aria-hidden="true">
+      <span class="timer-text" id="timer-text">⏱ 30초</span>
+      <div class="timer-bar"><div id="timer-fill"></div></div>
+    </div>
+    <p class="sr-only">문제마다 30초 안에 풀어요. 빨리 풀수록 보너스 점수가 있어요.</p>
+
+    <p class="tag" id="q-tag"></p>
+    <h2 class="question" id="q-text" tabindex="-1" data-focus></h2>
+    <div class="choices" id="choices" role="group" aria-label="보기"></div>
+
+    <div class="feedback" id="feedback" tabindex="-1" aria-live="polite" hidden>
+      <p class="fb-head"><span class="icon" id="fb-icon" aria-hidden="true"></span><span id="fb-title"></span></p>
+      <p class="fb-points" id="fb-points"></p>
+      <p class="fb-answer" id="fb-answer"></p>
+      <p class="fb-exp" id="fb-exp"></p>
+      <p class="fb-concept" id="fb-concept"></p>
+      <button type="button" class="btn primary" id="next">다음</button>
+    </div>
+
+    <button type="button" class="btn ghost" id="skip" hidden>점검용: 결과로 건너뛰기 (기록 저장 안 함)</button>
+  </section>
+
+  <!-- 4. 결과 -->
+  <section id="screen-result" class="screen" aria-labelledby="result-title" hidden>
+    <h2 id="result-title" tabindex="-1" data-focus>결과</h2>
+    <p class="lead" id="r-who"></p>
+    <div class="result-card">
+      <p class="r-label">최종 점수</p>
+      <p class="r-score" id="r-score"></p>
+      <p class="r-max" id="r-max"></p>
+      <p class="r-msg" id="r-msg"></p>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-label">정답 수</span><strong id="r-correct"></strong></div>
+      <div class="stat"><span class="stat-label">걸린 시간</span><strong id="r-time"></strong></div>
+      <div class="stat"><span class="stat-label">내 순위</span><strong id="r-rank"></strong><small id="r-rank-sub"></small></div>
+    </div>
+    <p class="note" id="r-note" hidden></p>
+    <p class="notice store-notice" hidden></p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="retry">다시 도전</button>
+      <button type="button" class="btn secondary" id="retry-wrong">틀린 문제만 다시 풀기</button>
+      <button type="button" class="btn ghost" id="result-rank">🏆 랭킹 보기</button>
+      <button type="button" class="btn ghost" id="to-home">처음으로</button>
+    </div>
+  </section>
+
+  <!-- 5. 랭킹 -->
+  <section id="screen-rank" class="screen" aria-labelledby="rank-title" hidden>
+    <button type="button" class="link" id="rank-back">← 뒤로</button>
+    <h2 id="rank-title" tabindex="-1" data-focus>🏆 랭킹</h2>
+    <p class="notice store-notice" hidden></p>
+    <div class="tabs" id="rank-modes" role="tablist" aria-label="랭킹 종류"></div>
+    <div class="subtabs" id="rank-subs" role="tablist" aria-label="세부 종류"></div>
+    <div id="rank-panel" role="tabpanel" aria-live="polite">
+      <h3 id="rank-heading"></h3>
+      <div id="rank-list"></div>
+    </div>
+    <button type="button" class="btn ghost danger" id="rank-reset">기록 지우기</button>
+  </section>
+
+</main>
+
+<script src="questions.js"></script>
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
