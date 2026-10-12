@@ -114,6 +114,7 @@ button.col-head small { font-weight: 500; }
 .choice .val { flex: 1; min-width: 0; }
 .choice .mark { flex: none; font-size: 1rem; font-weight: 800; white-space: nowrap; }
 .choice:not(:disabled):hover { border-color: var(--accent); }
+.choice:not(:disabled):active { border-color: var(--accent); background: var(--accent-soft); } /* 누르는 동안: 글자색(=분수선 색)은 그대로 */
 .choice:disabled { cursor: default; color: var(--text); }
 .choice.correct { border-color: var(--ok); background: var(--ok-bg); }
 .choice.correct .mark { color: var(--ok); }
@@ -134,21 +135,31 @@ button.col-head small { font-weight: 500; }
 #skip { margin-top: 16px; }
 
 /* 분수 · 음수 */
-/* 분수선: 글자색(currentColor)과 같은 색, 문제·보기는 3px, 작은 해설 글씨는 2px(절대 1px로 줄지 않게 px 고정).
-   align-items: stretch 로 분자·분모가 가장 긴 쪽 너비까지 늘어나 선이 그 너비만큼 꽉 차요. */
+/* 분수: 문제·보기·정답 표시·해설·개념이 모두 이 규칙 하나를 써요(위치별 덮어쓰기 없음).
+   분수선(.frac-bar)은 border 가 아니라 별도 요소에 background: currentColor 로 그려서 글자와 같은 밝은 색이 돼요.
+   높이는 max(2px, .12em): 아무리 작은 글씨에서도 2px 밑으로 줄지 않아요.
+   align-items: stretch 로 분자·분모 중 긴 쪽 너비까지 늘어나 선이 그 너비만큼 꽉 차요.
+   flex: none + min-height 로 flex 레이아웃(보기 버튼 안)에서도 선이 줄어들거나 0 이 되지 않아요. */
 .frac {
-  --bar: 3px;
   display: inline-flex; flex-direction: column; align-items: stretch; vertical-align: middle;
-  margin: 0 .22em; font-size: .85em; line-height: 1.2; text-align: center;
+  margin: 0 .22em; font-size: .85em; line-height: 1.2; text-align: center; color: inherit;
 }
-.frac .num { padding: 0 .3em .06em; border-bottom: var(--bar) solid currentColor; }
-.frac .den { padding: .06em .3em 0; }
+.frac .num, .frac .den { display: block; padding: 0 .3em; }
+.frac .num { padding-bottom: .06em; }
+.frac .den { padding-top: .06em; }
+.frac .frac-bar {
+  display: block; flex: none; align-self: stretch; box-sizing: border-box;
+  height: max(2px, .12em); min-height: 2px; background: currentColor;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+@media (forced-colors: active) {  /* 고대비 모드에서는 배경색이 바뀌므로 시스템 글자색으로 고정 */
+  .frac .frac-bar { forced-color-adjust: none; background: CanvasText; }
+}
 .neg {
   display: inline-block; vertical-align: middle; min-width: .9em; margin-right: .08em; text-align: center;
   font-weight: 900; color: var(--neg); background: var(--neg-bg); border-radius: .3em; padding: .05em .12em;
   line-height: 1.1;
 }
-.fb-exp .frac, .fb-answer .frac, .fb-concept .frac { font-size: .9em; --bar: 2px; }
 
 /* 결과 */
 .result-card { text-align: center; padding: 24px 16px; margin-bottom: 20px; background: var(--card); border: 2px solid var(--line); border-radius: 16px; }
@@ -174,6 +185,7 @@ button.col-head small { font-weight: 500; }
   background: var(--neg-bg); border: 2px solid var(--neg);
 }
 .note { text-align: center; color: var(--muted); font-weight: 700; }
+.app-version { text-align: center; color: var(--muted); font-size: .85rem; margin: 20px 0 0; }
 
 .timer { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
 .timer-text { flex: none; min-width: 5.5em; font-weight: 800; font-variant-numeric: tabular-nums; }

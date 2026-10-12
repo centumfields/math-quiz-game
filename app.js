@@ -20,6 +20,8 @@
   var LIMIT_MS = L.LIMIT_SEC * 1000;
   var RECORD_CAP = 100;  // 랭킹 종류마다 남기는 최대 기록 수
   var KEYS = { records: "mathquiz.records.v1", muted: "mathquiz.muted.v1" };
+  var APP_VERSION = "v3"; // 앱 파일을 고칠 때 sw.js 의 VERSION 과 같은 값으로 함께 올려요. 홈 화면 아래에 보여서 어떤 버전이 열려 있는지 알 수 있어요.
+  var reloadPending = false; // 새 버전을 받았지만 퀴즈 중이라 홈으로 돌아올 때 다시 불러올 예정
 
   // pick: 카테고리 모드면 "int-mul" 같은 키, 영역 모드면 "int", 전체 모드면 null
   var state = {
@@ -63,6 +65,17 @@
   }
 
   /* ---------- 수식 표시: "3/4" -> 위아래 분수, 음수 부호 강조 ---------- */
+  // 분수 한 개를 만든다. 문제·보기·정답 표시·해설·개념이 모두 이 함수와 같은 CSS(.frac)를 써요.
+  // 분수선은 border 가 아니라 별도 요소(.frac-bar)에 background: currentColor 로 그려요.
+  function makeFrac(num, den) {
+    var f = el("span", "frac");
+    var bar = el("span", "frac-bar");
+    bar.setAttribute("aria-hidden", "true");
+    f.appendChild(el("span", "num", num));
+    f.appendChild(bar);
+    f.appendChild(el("span", "den", den));
+    return f;
+  }
   function renderMath(parent, text) {
     var re = /(−?)(\d+)(?:\/(\d+))?/g;
     var last = 0, m;
@@ -71,10 +84,7 @@
       if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
       if (m[1]) parent.appendChild(el("span", "neg", "−"));
       if (m[3]) {
-        var f = el("span", "frac");
-        f.appendChild(el("span", "num", m[2]));
-        f.appendChild(el("span", "den", m[3]));
-        parent.appendChild(f);
+        parent.appendChild(makeFrac(m[2], m[3]));
       } else {
         parent.appendChild(document.createTextNode(m[2]));
       }
@@ -179,6 +189,7 @@
 
   /* ---------- 화면 전환 ---------- */
   function go(name) {
+    if (name === "home" && reloadPending) { reloadPending = false; location.reload(); return; }
     if (name !== "quiz") stopTimer();
     SCREENS.forEach(function (n) { $("screen-" + n).hidden = n !== name; });
     window.scrollTo(0, 0);
@@ -540,6 +551,7 @@
 
   /* ---------- 이벤트 ---------- */
   function init() {
+    $("app-version").textContent = "앱 버전 " + APP_VERSION;
     loadStore();
     renderSoundButton();
     $("sound-btn").addEventListener("click", toggleSound);
@@ -581,6 +593,14 @@
   // 오프라인 실행용 서비스 워커. file:// 로 열었을 땐 지원되지 않으니 건너뛰어요(게임은 그대로 동작).
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+    // 이미 설치된 앱이 새 버전을 받으면(첫 설치는 제외) 홈 화면에서 바로 다시 불러와요.
+    // 퀴즈를 푸는 중이면 진행을 잃지 않도록 홈으로 돌아올 때 다시 불러와요.
+    var hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadController) { hadController = true; return; }
+      if (!$("screen-home").hidden) location.reload();
+      else reloadPending = true;
+    });
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("sw.js").catch(function () { /* 실패해도 게임은 계속돼요 */ });
     });
