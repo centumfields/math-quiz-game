@@ -12,6 +12,7 @@ description: 문제은행 일일 점검·보충 — 구조 파악, 분포 확인
 - 중단 시점에 이미 파일을 바꿨다면(5단계) 단계 5의 **롤백**을 먼저 수행한 뒤 보고합니다. 롤백한 사실과 결과도 보고에 포함합니다.
 - `python`은 스토어 스텁일 수 있으므로 `%LOCALAPPDATA%\Programs\Python\Python313\python.exe`를 씁니다. Node는 없습니다. 임시 스크립트와 스냅샷은 스크래치패드에 두고 프로젝트에는 두지 않습니다(6단계 백업만 예외).
 - `questions.js`는 **직접 수정하지 않습니다.** 문제 추가는 `gen_questions.py`를 고치고 재생성해서만 합니다.
+- 종료 코드를 확인할 명령(`validate_questions.py`, `gen_questions.py` 등)의 출력을 `Select-Object -First N`, `head` 같은 것으로 **파이프로 자르지 않습니다.** 파이프가 먼저 닫히면 종료 코드가 -1 등으로 잘못 나옵니다. 출력은 변수에 담거나 전부 받은 뒤 `$LASTEXITCODE`를 확인하고, 줄이고 싶으면 그 뒤에 따로 자릅니다.
 - 파일이 UTF-8이고 마이너스는 `−`(U+2212)이므로, 출력이 깨져 보이면 `PYTHONIOENCODING=utf-8`로 실행합니다.
 
 ## 1. 퀴즈 파일 구조 읽기·이해
