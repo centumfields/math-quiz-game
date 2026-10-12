@@ -18,9 +18,8 @@
   var SCREENS = ["home", "cat", "quiz", "result", "rank"];
   var CHECK = /[?&]check=1(&|$)/.test(location.search); // 점검용: 퀴즈 중 결과로 건너뛰기 버튼
   var LIMIT_MS = L.LIMIT_SEC * 1000;
-  var RECORD_CAP = 100;  // 랭킹 종류마다 남기는 최대 기록 수
   var KEYS = { records: "mathquiz.records.v1", muted: "mathquiz.muted.v1" };
-  var APP_VERSION = "v3"; // 앱 파일을 고칠 때 sw.js 의 VERSION 과 같은 값으로 함께 올려요. 홈 화면 아래에 보여서 어떤 버전이 열려 있는지 알 수 있어요.
+  var APP_VERSION = "v4"; // 앱 파일을 고칠 때 sw.js 의 VERSION 과 같은 값으로 함께 올려요. 홈 화면 아래에 보여서 어떤 버전이 열려 있는지 알 수 있어요.
   var reloadPending = false; // 새 버전을 받았지만 퀴즈 중이라 홈으로 돌아올 때 다시 불러올 예정
 
   // pick: 카테고리 모드면 "int-mul" 같은 키, 영역 모드면 "int", 전체 모드면 null
@@ -420,7 +419,7 @@
         id: newId(), nick: state.nick, key: currentKey(), label: keyLabel(currentKey()),
         score: state.score, correct: correct, total: total, timeMs: Math.round(timeMs), at: Date.now()
       };
-      rankInfo = L.addRecord(store.records, rec, RECORD_CAP);
+      rankInfo = L.addRecord(store.records, rec, L.RECORD_CAP);
       store.records = rankInfo.records;
       saveRecords();
       state.last = rec;

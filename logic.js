@@ -9,6 +9,7 @@
   var BASE_POINTS = 10;  // 정답 기본 점수
   var MAX_BONUS = 5;     // 속도 보너스 최대
   var LIMIT_SEC = 30;    // 문제당 제한 시간
+  var RECORD_CAP = 100;  // 랭킹 종류마다 남기는 최대 기록 수
 
   function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
 
@@ -76,7 +77,7 @@
   }
 
   return {
-    BASE_POINTS: BASE_POINTS, MAX_BONUS: MAX_BONUS, LIMIT_SEC: LIMIT_SEC,
+    BASE_POINTS: BASE_POINTS, MAX_BONUS: MAX_BONUS, LIMIT_SEC: LIMIT_SEC, RECORD_CAP: RECORD_CAP,
     bonusFor: bonusFor, questionScore: questionScore, maxScore: maxScore,
     compareRecords: compareRecords, sortRecords: sortRecords, rankKey: rankKey,
     recordsFor: recordsFor, addRecord: addRecord, sanitizeRecords: sanitizeRecords,

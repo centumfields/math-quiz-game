@@ -1,7 +1,7 @@
 /* 서비스 워커: 처음 한 번 파일을 모두 저장해 두고, 이후에는 인터넷 없이도 실행해요.
  * 앱 파일(index.html, app.js, questions.js 등)을 고쳤다면 VERSION 을 올려 주세요.
  * 그래야 이미 설치된 앱이 새 파일로 바뀌어요. */
-var VERSION = "v3";
+var VERSION = "v4";
 var CACHE = "mathquiz-" + VERSION;
 var ASSETS = [
   "./",
